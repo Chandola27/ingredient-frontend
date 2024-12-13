@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingredient Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+        }
+        main {
+            margin: 20px;
+        }
+        form {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            display: block;
+            margin: 10px auto;
+            padding: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .results {
+            margin-top: 20px;
+            text-align: left;
+            display: inline-block;
+        }
+        .pie-chart {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ingredient Analyzer</h1>
+    </header>
+    <main>
+        <h2>Upload an Ingredient Label Image</h2>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <button type="submit">Analyze</button>
+        </form>
+
+        <div class="results" id="results">
+            <!-- Analysis results will be displayed here -->
+        </div>
+        <div class="pie-chart" id="pie-chart">
+            <!-- Pie chart will be displayed here -->
+        </div>
+    </main>
+    <footer>
+        <p>Ingredient Analyzer &copy; 2024</p>
+    </footer>
+</body>
+</html>
+
+----------------------------------------------------------------------------------------
+<script>
+    document.querySelector('form').addEventListener('submit', async (event) => {
+        event.preventDefault(); // Prevent default form submission
+        const formData = new FormData(event.target);
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // Display ingredients
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '<h3>Ingredients</h3>';
+                for (const [ingredient, percentage] of Object.entries(data.ingredients)) {
+                    resultsDiv.innerHTML += `<p>${ingredient}: ${percentage}%</p>`;
+                }
+
+                // Display pie chart
+                const pieChartDiv = document.getElementById('pie-chart');
+                pieChartDiv.innerHTML = `<img src="${data.chart}" alt="Pie Chart">`;
+            } else {
+                alert('Error analyzing the image. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please check the console for details.');
+        }
+    });
+</script>
